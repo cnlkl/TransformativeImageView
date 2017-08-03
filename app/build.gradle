@@ -29,5 +29,5 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC1'
     testCompile 'junit:junit:4.12'
-    compile project(path: ':transformativeimageview')
+    compile 'com.github.cnlkl:TransformativeImageView:v0.1-alpha'
 }
