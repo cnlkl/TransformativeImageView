@@ -473,7 +473,6 @@ public class TransformativeImageView extends AppCompatImageView {
             addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    // FIXME 避免动画被cancel后mMatrix的值不正确
                     mMatrix.setValues(toMatrixValue);
                     applyMatrix();
                 }
