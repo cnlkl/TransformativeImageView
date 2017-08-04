@@ -10,10 +10,12 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 
@@ -38,7 +40,7 @@ public class TransformativeImageView extends AppCompatImageView {
     private float mVerticalMinScaleFactor = MIN_SCALE_FACTOR; // 图片最初的最小缩放比例
     private float mHorizontalMinScaleFactor = MIN_SCALE_FACTOR; // 图片旋转90（或-90）度后的的最小缩放比例
     protected Matrix mMatrix = new Matrix(); // 用于图片旋转、平移、缩放的矩阵
-    protected RectF mImageRect = new RectF(); // 保存图片所在区域矩形
+    protected RectF mImageRect = new RectF(); // 保存图片所在区域矩形，坐标为相对于本View的坐标
     private boolean mRevert = true; // 是否开启回弹
 
     public TransformativeImageView(Context context) {
@@ -400,26 +402,27 @@ public class TransformativeImageView extends AppCompatImageView {
         float dx = 0f;
         float dy = 0f;
 
+        // mImageRect中的坐标值为相对View的值
         // 图片宽大于控件时图片与控件之间不能有白边
         if (mImageRect.width() > getWidth()) {
-            if (mImageRect.left > getLeft()) {/*判断图片左边界与控件之间是否有空隙*/
+            if (mImageRect.left > 0) {/*判断图片左边界与控件之间是否有空隙*/
                 dx = -mImageRect.left;
-            } else if(mImageRect.right < getRight()) {/*判断图片右边界与控件之间是否有空隙*/
-                dx = getRight() - mImageRect.right;
+            } else if(mImageRect.right < getWidth()) {/*判断图片右边界与控件之间是否有空隙*/
+                dx = getWidth() - mImageRect.right;
             }
         } else {/*宽小于控件则移动到中心*/
-            dx = getPivotX() - mImageRect.centerX();
+            dx = getWidth() / 2 - mImageRect.centerX();
         }
 
         // 图片高大于控件时图片与控件之间不能有白边
         if (mImageRect.height() > getHeight()) {
-            if (mImageRect.top > getTop()) {/*判断图片上边界与控件之间是否有空隙*/
+            if (mImageRect.top > 0) {/*判断图片上边界与控件之间是否有空隙*/
                 dy = -mImageRect.top;
-            } else if(mImageRect.bottom < getBottom()) {/*判断图片下边界与控件之间是否有空隙*/
-                dy = getBottom() - mImageRect.bottom;
+            } else if(mImageRect.bottom < getHeight()) {/*判断图片下边界与控件之间是否有空隙*/
+                dy = getHeight() - mImageRect.bottom;
             }
         } else {/*高小于控件则移动到中心*/
-            dy = getPivotY() - mImageRect.centerY();
+            dy = getHeight() / 2 - mImageRect.centerY();
         }
         mMatrix.postTranslate(dx, dy);
     }

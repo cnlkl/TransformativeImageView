@@ -11,10 +11,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TransformativeImageView transformativeImageView1 =
-                (TransformativeImageView) findViewById(R.id.multi_touch_view1);
+        TransformativeImageView transformativeImageView =
+                (TransformativeImageView) findViewById(R.id.transformative_image_view);
         GlideApp.with(this)
                 .load(R.drawable.cat)
-                .into(transformativeImageView1);
+                .into(transformativeImageView);
     }
 }
