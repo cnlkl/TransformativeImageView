@@ -111,12 +111,6 @@ public class TransformativeImageView extends AppCompatImageView {
         mVerticalMinScaleFactor = Math.min(getHeight() / mImageRect.width(),
                 getWidth() / mImageRect.height());
 
-        // 如果用户有指定最小缩放比例则使用用户指定的
-        if (mMinScaleFactor != UNSPECIFIED_SCALE_FACTOR) {
-            mHorizontalMinScaleFactor = mMinScaleFactor;
-            mVerticalMinScaleFactor = mMinScaleFactor;
-        }
-
         float scaleFactor = mHorizontalMinScaleFactor;
 
         // 初始图片缩放比例比最小缩放比例稍大
@@ -128,6 +122,12 @@ public class TransformativeImageView extends AppCompatImageView {
         mMatrix.postTranslate(getPivotX() - mImageRect.centerX(),
                 getPivotY() - mImageRect.centerY());
         applyMatrix();
+
+        // 如果用户有指定最小缩放比例则使用用户指定的
+        if (mMinScaleFactor != UNSPECIFIED_SCALE_FACTOR) {
+            mHorizontalMinScaleFactor = mMinScaleFactor;
+            mVerticalMinScaleFactor = mMinScaleFactor;
+        }
     }
 
     private PaintFlagsDrawFilter mDrawFilter =
