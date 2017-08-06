@@ -1,7 +1,10 @@
 # TransformativeImageView
-[blog](http://www.jianshu.com/p/938ca88fb16a)
-## Screenshot
 
+A custom ImageView that can rotate, pan, and scale the image
+
+[introduction](http://www.jianshu.com/p/938ca88fb16a)
+
+## Screenshot
 ![screenshot](https://raw.githubusercontent.com/cnlkl/TransformativeImageView/master/screenshot/transmative_image_view_screenshot.gif)
 
 ## Add dependency
@@ -20,12 +23,11 @@ allprojects {
 ### **Step 2.** Add the dependency
 ```gradle
 dependencies {
-        compile 'com.github.cnlkl:TransformativeImageView:0.3-alpha'
+        compile 'com.github.cnlkl:TransformativeImageView:1.0-alpha'
 }
 ```
 
-## Usage
-
+## How to use
 ### Activity
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -54,15 +56,19 @@ public class MainActivity extends AppCompatActivity {
     tools:context="cn.lkllkllkl.transformativeimageviewsample.MainActivity">
 
     <cn.lkllkllkl.transformativeimageview.TransformativeImageView
-        android:id="@+id/multi_touch_view1"
+        android:background="@color/gray"
+        android:id="@+id/transformative_image_view"
+        android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:revert="true"
+        app:open_rotate_revert="true"
+        app:open_scale_revert="true"
+        app:open_translate_revert="true"
         app:revert_duration="300"
         app:max_scale="4"
+        app:min_scale="1"
         app:scale_center="finger_center"
         />
 
-</android.support.constraint.ConstraintLayout>
-
+</FrameLayout>
 ```
