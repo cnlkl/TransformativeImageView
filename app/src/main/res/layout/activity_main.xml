@@ -12,9 +12,12 @@
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:revert="true"
+        app:open_rotate_revert="true"
+        app:open_scale_revert="true"
+        app:open_translate_revert="true"
         app:revert_duration="300"
         app:max_scale="4"
+        app:min_scale="1"
         app:scale_center="finger_center"
         />
 
