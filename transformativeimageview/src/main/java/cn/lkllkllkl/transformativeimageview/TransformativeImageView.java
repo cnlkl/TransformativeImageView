@@ -21,6 +21,7 @@ import android.view.MotionEvent;
  * 多点触控加Matrix类实现图片的旋转、缩放、平移
  *
  * @attr R.styleable#TransformativeImageView_max_scale
+ * @attr R.styleable#TransformativeImageView_min_scale
  * @attr R.styleable#TransformativeImageView_revert_duration
  * @attr R.styleable#TransformativeImageView_revert
  * @attr R.styleable#TransformativeImageView_scale_center
@@ -29,17 +30,22 @@ import android.view.MotionEvent;
 public class TransformativeImageView extends AppCompatImageView {
     private static final String TAG = TransformativeImageView.class.getSimpleName();
     private static final float MAX_SCALE_FACTOR = 2.0f; // 默认最大缩放比例为2
+    private static final float UNSPECIFIED_SCALE_FACTOR = -1f; // 未指定缩放比例
     private static final float MIN_SCALE_FACTOR = 1.0f; // 默认最小缩放比例为0.3
     private static final float INIT_SCALE_FACTOR = 1.2f; // 默认适应控件大小后的初始化缩放比例
     private static final int DEFAULT_REVERT_DURATION = 300;
 
     private int mRevertDuration = DEFAULT_REVERT_DURATION; // 回弹动画时间
     private float mMaxScaleFactor = MAX_SCALE_FACTOR; // 最大缩放比例
+    private float mMinScaleFactor = UNSPECIFIED_SCALE_FACTOR; // 此最小缩放比例优先级高于下面两个
     private float mVerticalMinScaleFactor = MIN_SCALE_FACTOR; // 图片最初的最小缩放比例
     private float mHorizontalMinScaleFactor = MIN_SCALE_FACTOR; // 图片旋转90（或-90）度后的的最小缩放比例
     protected Matrix mMatrix = new Matrix(); // 用于图片旋转、平移、缩放的矩阵
     protected RectF mImageRect = new RectF(); // 保存图片所在区域矩形，坐标为相对于本View的坐标
-    private boolean mRevert = true; // 是否开启回弹
+    private boolean mOpenScaleRevert = false; // 是否开启缩放回弹
+    private boolean mOpenRotateRevert = false; // 是否开启旋转回弹
+    private boolean mOpenTranslateRevert = false; // 是否开启平移回弹
+
 
     public TransformativeImageView(Context context) {
         super(context);
@@ -63,10 +69,16 @@ public class TransformativeImageView extends AppCompatImageView {
                 .obtainStyledAttributes(attrs, R.styleable.TransformativeImageView);
         mMaxScaleFactor = typedArray.getFloat(
                 R.styleable.TransformativeImageView_max_scale, MAX_SCALE_FACTOR);
+        mMinScaleFactor = typedArray.getFloat(
+                R.styleable.TransformativeImageView_min_scale, UNSPECIFIED_SCALE_FACTOR);
         mRevertDuration = typedArray.getInteger(
                 R.styleable.TransformativeImageView_revert_duration, DEFAULT_REVERT_DURATION);
-        mRevert = typedArray.getBoolean(
-                R.styleable.TransformativeImageView_revert, true);
+        mOpenScaleRevert = typedArray.getBoolean(
+                R.styleable.TransformativeImageView_open_scale_revert, false);
+        mOpenRotateRevert = typedArray.getBoolean(
+                R.styleable.TransformativeImageView_open_rotate_revert, false);
+        mOpenTranslateRevert = typedArray.getBoolean(
+                R.styleable.TransformativeImageView_open_translate_revert, false);
         mScaleBy = typedArray.getInt(
                 R.styleable.TransformativeImageView_scale_center, SCALE_BY_IMAGE_CENTER);
         typedArray.recycle();
@@ -99,6 +111,12 @@ public class TransformativeImageView extends AppCompatImageView {
         mVerticalMinScaleFactor = Math.min(getHeight() / mImageRect.width(),
                 getWidth() / mImageRect.height());
 
+        // 如果用户有指定最小缩放比例则使用用户指定的
+        if (mMinScaleFactor != UNSPECIFIED_SCALE_FACTOR) {
+            mHorizontalMinScaleFactor = mMinScaleFactor;
+            mVerticalMinScaleFactor = mMinScaleFactor;
+        }
+
         float scaleFactor = mHorizontalMinScaleFactor;
 
         // 初始图片缩放比例比最小缩放比例稍大
@@ -128,7 +146,7 @@ public class TransformativeImageView extends AppCompatImageView {
     private float mScaleFactor = 1.0f; // 当前的缩放倍数
     private boolean mCanScale = false; // 是否可以缩放
 
-    private PointF mLastMidPoint = new PointF(); // 图片平移时记录上一次ACTION_MOVE的点
+    protected PointF mLastMidPoint = new PointF(); // 图片平移时记录上一次ACTION_MOVE的点
     private PointF mCurrentMidPoint = new PointF(); // 当前各触点的中点
     protected boolean mCanDrag = false; // 是否可以平移
 
@@ -180,14 +198,14 @@ public class TransformativeImageView extends AppCompatImageView {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 // 检测是否需要回弹
-                if(mRevert) {
+                if(mOpenRotateRevert || mOpenScaleRevert || mOpenTranslateRevert) {
                     mMatrix.getValues(mFromMatrixValue);/*设置矩阵动画初始值*/
                     /* 旋转和缩放都会影响矩阵，进而影响后续需要使用到ImageRect的地方，
                      * 所以检测顺序不能改变
                      */
-                    checkRotation();
-                    checkScale();
-                    checkBorder();
+                    if(mOpenRotateRevert) checkRotation();
+                    if(mOpenScaleRevert) checkScale();
+                    if(mOpenTranslateRevert) checkBorder();
                     mMatrix.getValues(mToMatrixValue);/*设置矩阵动画结束值*/
                     // 启动回弹动画
                     mRevertAnimator.setMatrixValue(mFromMatrixValue, mToMatrixValue);
@@ -233,7 +251,7 @@ public class TransformativeImageView extends AppCompatImageView {
         return (float) Math.toDegrees(rad);
     }
 
-    private void translate(PointF midPoint) {
+    protected void translate(PointF midPoint) {
         float dx = midPoint.x - mLastMidPoint.x;
         float dy = midPoint.y - mLastMidPoint.y;
         mMatrix.postTranslate(dx, dy);
