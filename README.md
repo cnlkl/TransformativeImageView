@@ -23,7 +23,7 @@ allprojects {
 ### **Step 2.** Add the dependency
 ```gradle
 dependencies {
-        compile 'com.github.cnlkl:TransformativeImageView:1.0-alpha'
+         compile 'com.github.cnlkl:TransformativeImageView:1.1-alpha'
 }
 ```
 
