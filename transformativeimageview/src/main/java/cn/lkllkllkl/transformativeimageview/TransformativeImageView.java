@@ -45,6 +45,7 @@ public class TransformativeImageView extends AppCompatImageView {
     private boolean mOpenScaleRevert = false; // 是否开启缩放回弹
     private boolean mOpenRotateRevert = false; // 是否开启旋转回弹
     private boolean mOpenTranslateRevert = false; // 是否开启平移回弹
+    private boolean mOpenAnimator = false; // 是否开启动画
 
 
     public TransformativeImageView(Context context) {
@@ -79,6 +80,8 @@ public class TransformativeImageView extends AppCompatImageView {
                 R.styleable.TransformativeImageView_open_rotate_revert, false);
         mOpenTranslateRevert = typedArray.getBoolean(
                 R.styleable.TransformativeImageView_open_translate_revert, false);
+        mOpenAnimator = typedArray.getBoolean(
+                R.styleable.TransformativeImageView_open_animator, true);
         mScaleBy = typedArray.getInt(
                 R.styleable.TransformativeImageView_scale_center, SCALE_BY_IMAGE_CENTER);
         typedArray.recycle();
@@ -207,10 +210,14 @@ public class TransformativeImageView extends AppCompatImageView {
                     if(mOpenScaleRevert) checkScale();
                     if(mOpenTranslateRevert) checkBorder();
                     mMatrix.getValues(mToMatrixValue);/*设置矩阵动画结束值*/
-                    // 启动回弹动画
-                    mRevertAnimator.setMatrixValue(mFromMatrixValue, mToMatrixValue);
-                    mRevertAnimator.cancel();
-                    mRevertAnimator.start();
+                    if(mOpenAnimator) {
+                        // 启动回弹动画
+                        mRevertAnimator.setMatrixValue(mFromMatrixValue, mToMatrixValue);
+                        mRevertAnimator.cancel();
+                        mRevertAnimator.start();
+                    } else {
+                        applyMatrix();
+                    }
                 }
             case MotionEvent.ACTION_POINTER_UP:
                 mCanScale = false;

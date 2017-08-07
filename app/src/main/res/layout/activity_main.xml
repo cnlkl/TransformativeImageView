@@ -18,6 +18,7 @@
         app:revert_duration="300"
         app:max_scale="4"
         app:min_scale="1"
+        app:open_animator="true"
         app:scale_center="finger_center"
         />
 
