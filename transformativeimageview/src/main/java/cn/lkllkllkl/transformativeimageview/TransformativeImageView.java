@@ -49,7 +49,7 @@ public class TransformativeImageView extends AppCompatImageView {
 
 
     public TransformativeImageView(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public TransformativeImageView(Context context, @Nullable AttributeSet attrs) {
