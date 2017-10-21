@@ -122,8 +122,8 @@ public class TransformativeImageView extends AppCompatImageView {
         mMatrix.postScale(scaleFactor, scaleFactor, mImageRect.centerX(), mImageRect.centerY());
         refreshImageRect();
         // 移动图片到中心
-        mMatrix.postTranslate(getPivotX() - mImageRect.centerX(),
-                getPivotY() - mImageRect.centerY());
+        mMatrix.postTranslate((getRight() - getLeft()) / 2 - mImageRect.centerX(),
+                (getBottom() - getTop()) / 2 - mImageRect.centerY());
         applyMatrix();
 
         // 如果用户有指定最小缩放比例则使用用户指定的
